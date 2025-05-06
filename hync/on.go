@@ -2,28 +2,28 @@ package hync
 
 import "sync"
 
-type On[T any] struct {
+type On struct {
 	mu sync.Mutex
-	on []func(ctx *T)
+	on []func()
 }
 
-func NewOn[T any](on ...func(ctx *T)) *On[T] {
-	return &On[T]{
+func NewOn(on ...func()) *On {
+	return &On{
 		on: on,
 	}
 }
 
-func (w *On[T]) Add(on func(ctx *T)) {
+func (w *On) Add(on func()) {
 	w.mu.Lock()
 	defer w.mu.Unlock()
 	w.on = append(w.on, on)
 }
 
-func (w *On[T]) On(ctx *T) {
+func (w *On) On() {
 	if len(w.on) == 0 {
 		return
 	}
 	for _, on := range w.on {
-		on(ctx)
+		on()
 	}
 }
