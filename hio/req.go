@@ -11,10 +11,19 @@ import (
 )
 
 const (
-	ReqSerializeErr herr.Code = 10101010
-	ReqVerifyErr    herr.Code = 10101011
-	ReqMarshalErr   herr.Code = 10101012
-	ReqUnmarshalErr herr.Code = 10101013
+	ReqSerializeErr         herr.Code = 10101010
+	ReqVerifyErr            herr.Code = 10101011
+	ReqMarshalErr           herr.Code = 10101012
+	ReqUnmarshalErr         herr.Code = 10101013
+	ReqRequireReqID         herr.Code = 10101014
+	ReqRequireTokenID       herr.Code = 10101015
+	ReqRequireTimestamp     herr.Code = 10101016
+	ReqRequireSignature     herr.Code = 10101017
+	ReqRequireNearTimestamp herr.Code = 10101018
+	ReqParseBodyDataErr     herr.Code = 10101020
+	ReqSerializeBodyDataErr herr.Code = 10101021
+	ReqMethodMustBePost     herr.Code = 10101040
+	ReqApiGuardVerifyErr    herr.Code = 10101041
 )
 
 type Request[T any] struct {
@@ -27,18 +36,21 @@ type Request[T any] struct {
 }
 
 func NewRequest[T any](tokenID string, data *T) *Request[T] {
-	randInt64 := rand.Int64()
 	return &Request[T]{
 		Data:      data,
 		ReqID:     idx.New(),
 		TokenID:   tokenID,
 		Timestamp: time.Now().UnixMilli(),
-		Nonce:     randInt64,
+		Nonce:     rand.Int64(),
 	}
 }
 
 func (req *Request[T]) Sign(priKey []byte) *herr.Error {
-	bytes, err := req.doSerialize()
+	dataStr, nErr := OrderedSerialize(req.Data)
+	if nErr != nil {
+		return herr.Of(ReqSerializeBodyDataErr, "serialize data err:"+nErr.Error())
+	}
+	bytes, err := req.doSerialize([]byte(dataStr))
 	if err != nil {
 		return err
 	}
@@ -47,14 +59,33 @@ func (req *Request[T]) Sign(priKey []byte) *herr.Error {
 	return nil
 }
 
-func (req *Request[T]) Verify(pubKey []byte) *herr.Error {
-	bytes, err := req.doSerialize()
+func (req *Request[T]) PreVerify() *herr.Error {
+	if len(req.ReqID) == 0 {
+		return herr.Of(ReqRequireReqID, "require req_id")
+	}
+	if len(req.TokenID) == 0 {
+		return herr.Of(ReqRequireTokenID, "require token_id")
+	}
+	if req.Timestamp == 0 {
+		return herr.Of(ReqRequireTimestamp, "require timestamp")
+	}
+	if time.Now().Sub(time.UnixMilli(req.Timestamp)) > 10*time.Second {
+		return herr.Of(ReqRequireNearTimestamp, "require near timestamp")
+	}
+	if len(req.Signature) == 0 {
+		return herr.Of(ReqRequireSignature, "require signature")
+	}
+	return nil
+}
+
+func (req *Request[T]) Verify(pubKey []byte, data []byte) *herr.Error {
+	bytes, err := req.doSerialize(data)
 	if err != nil {
 		return err
 	}
 	bytesSign, nErr := hex.DecodeString(req.Signature)
 	if nErr != nil {
-		return err
+		return herr.Of(ReqVerifyErr, "invalid signature: "+nErr.Error())
 	}
 	valid := hed25519.Verify(pubKey, bytes, bytesSign)
 	if !valid {
@@ -86,11 +117,11 @@ func RequestUnmarshal[T any](data []byte) (*Request[T], *herr.Error) {
 	return &req, nil
 }
 
-func (req *Request[T]) doSerialize() ([]byte, *herr.Error) {
+func (req *Request[T]) doSerialize(data []byte) ([]byte, *herr.Error) {
 	serializeStr, err := OrderedSerialize(map[string]interface{}{
 		"req_id":    req.ReqID,
 		"token_id":  req.TokenID,
-		"data":      req.Data,
+		"data":      data,
 		"timestamp": req.Timestamp,
 		"nonce":     req.Nonce,
 	})
