@@ -8,9 +8,18 @@ import (
 
 func ToBytes(obj interface{}) ([]byte, error) {
 	if obj == nil {
-		return nil, nil
+		return []byte{}, nil
 	}
 	return json.Marshal(obj)
+}
+
+func MustToBytes(obj interface{}) []byte {
+	bytes, err := ToBytes(obj)
+	if err != nil {
+		hlog.Err("hyle.json.MustToBytes", zap.Error(err))
+		return []byte{}
+	}
+	return bytes
 }
 
 func ToString(obj interface{}) (string, error) {
