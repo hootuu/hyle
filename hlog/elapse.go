@@ -6,7 +6,7 @@ import (
 )
 
 func Elapse(fun string, fix ...func() []zap.Field) func() {
-	start := time.Now().UnixMilli()
+	start := time.Now()
 	var prefixFields []zap.Field
 	if len(fix) > 0 {
 		prefixFields = fix[0]()
@@ -18,8 +18,8 @@ func Elapse(fun string, fix ...func() []zap.Field) func() {
 	}
 
 	return func() {
-		elapse := time.Now().UnixMilli() - start
-		suffixFields := []zap.Field{zap.Int64("_elapse", elapse)}
+		elapse := time.Since(start)
+		suffixFields := []zap.Field{zap.Int64("_elapse", elapse.Milliseconds())}
 		if len(fix) > 1 {
 			fs := fix[1]()
 			if len(fs) > 1 {
