@@ -32,3 +32,12 @@ func (m *Media) SetMeta(key string, val string) *Media {
 	m.Meta[key] = val
 	return m
 }
+
+func NewDict() Dict {
+	return make(Dict)
+}
+
+func (d Dict) Put(key string, m ...*Media) Dict {
+	d[key] = append(d[key], m...)
+	return d
+}
