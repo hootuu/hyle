@@ -2,6 +2,7 @@ package collar
 
 import (
 	"fmt"
+	"github.com/hootuu/hyle/crypto/hmd5"
 	"github.com/hootuu/hyle/hlog"
 	"github.com/mr-tron/base58"
 	"go.uber.org/zap"
@@ -45,10 +46,14 @@ func (c Collar) Parse() (string, string) {
 	return arr[0], arr[1]
 }
 
-func (c Collar) String() string {
+func (c Collar) ToString() string {
 	return string(c)
 }
 
-func (c Collar) ID() ID {
+func (c Collar) ToID() ID {
 	return base58.Encode([]byte(c))
+}
+
+func (c Collar) ToSafeID() ID {
+	return hmd5.MD5(hmd5.MD5(c.ToID()))
 }

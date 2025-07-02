@@ -18,7 +18,7 @@ func NewMachine() *Machine {
 	}
 }
 
-func (m *Machine) AddTransition(current State, event Event, trans Transition) {
+func (m *Machine) AddTransition(current State, event Event, trans Transition) *Machine {
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
@@ -27,6 +27,7 @@ func (m *Machine) AddTransition(current State, event Event, trans Transition) {
 	}
 
 	m.transitions[current][event] = trans
+	return m
 }
 
 func (m *Machine) Handle(ctx context.Context, current State, event Event, data dict.Dict) (State, error) {
