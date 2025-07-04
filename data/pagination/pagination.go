@@ -115,12 +115,12 @@ func PagingAll() *Paging {
 
 type Pagination[T any] struct {
 	Paging *Paging `json:"paging"`
-	Data   []*T    `json:"data"`
+	Data   []T     `json:"data"`
 }
 
-func NewPagination[T any](paging *Paging, data []*T) *Pagination[T] {
+func NewPagination[T any](paging *Paging, data []T) *Pagination[T] {
 	if data == nil {
-		data = make([]*T, 0)
+		data = make([]T, 0)
 	}
 	return &Pagination[T]{
 		Paging: paging,
@@ -128,7 +128,7 @@ func NewPagination[T any](paging *Paging, data []*T) *Pagination[T] {
 	}
 }
 
-func (p *Pagination[T]) Iter(fn func(item *T, idx int)) {
+func (p *Pagination[T]) Iter(fn func(item T, idx int)) {
 	for idx, item := range p.Data {
 		fn(item, idx)
 	}
