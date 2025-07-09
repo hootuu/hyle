@@ -20,3 +20,17 @@ func Universal(call func() error) {
 		hlog.Err("hyle.retry.Universal", zap.Error(err))
 	}
 }
+
+func Must(call func() error) error {
+	err := retry.Do(func() error {
+		return call()
+	},
+		retry.Attempts(cast.ToUint(hcfg.GetInt("retry.must.attempts", 3))),
+		retry.Delay(hcfg.GetDuration("retry.must.delay", 600*time.Millisecond)),
+	)
+	if err != nil {
+		hlog.Err("hyle.retry.Universal", zap.Error(err))
+		return err
+	}
+	return nil
+}

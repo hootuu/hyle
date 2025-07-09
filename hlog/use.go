@@ -24,12 +24,18 @@ func Err(msg string, fields ...zap.Field) {
 	gErrorLogger.Error(msg, fields...)
 }
 
+func Fix(msg string, fields ...zap.Field) {
+	gFixLogger.Error(msg, fields...)
+}
+
 var gErrorLogger *zap.Logger
 var gInfoLogger *zap.Logger
 var gElapseLogger *zap.Logger
+var gFixLogger *zap.Logger
 
 func init() {
 	gErrorLogger = getLogger("errors")
 	gInfoLogger = getLogger("commons")
 	gElapseLogger = getLogger("elapse")
+	gFixLogger = getLogger("fix")
 }
