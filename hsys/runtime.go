@@ -33,7 +33,7 @@ func Exit(err error) {
 
 func init() {
 	gServerID = strings.ToUpper(xid.New().String())
-	gRunMode = ModeOf(hcfg.GetString(SysRunModeCfg))
+	gRunMode = ModeOf(hcfg.GetString(SysRunModeCfg, localName))
 	wd, nErr := os.Getwd()
 	if nErr != nil {
 		Error("Get Current Working Directory Failed: ", nErr.Error())
@@ -42,6 +42,6 @@ func init() {
 	}
 	gWorkingDirectory = wd
 	Success("# Server ID: ", ServerID)
-	Success("# Run Mode: ", strings.ToUpper(string(gRunMode)))
+	Success("# Run Mode: ", strings.ToUpper(gRunMode.String()))
 	Success("# Working Directory: ", WorkingDirectory)
 }
