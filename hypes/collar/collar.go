@@ -15,6 +15,7 @@ const (
 
 type Collar string
 type ID = string
+type SafeID string
 
 func Build(code string, id string) Collar {
 	str := code + split + id
@@ -35,6 +36,39 @@ func FromID(id ID) (Collar, error) {
 		return "", fmt.Errorf("invalid collar: %s", src)
 	}
 	return Build(arr[0], arr[1]), nil
+}
+
+func MustFromID(id ID) Collar {
+	c, err := FromID(id)
+	if err != nil {
+		hlog.Fix("collar.mustFromID", zap.String("id", string(id)), zap.Error(err))
+	}
+	return c
+}
+
+func MustParse(id ID, call func(code string, id string)) {
+	col, err := FromID(id)
+	if err != nil {
+		hlog.Fix("collar.mustParse", zap.String("id", id), zap.Error(err))
+		return
+	}
+	code, id := col.Parse()
+	call(code, id)
+}
+
+func MultiMustParse(call func(code string, id string), ids ...ID) {
+	if len(ids) == 0 {
+		return
+	}
+	for _, idStr := range ids {
+		col, err := FromID(idStr)
+		if err != nil {
+			hlog.Fix("collar.mustParse", zap.String("id", idStr), zap.Error(err))
+			continue
+		}
+		code, id := col.Parse()
+		call(code, id)
+	}
 }
 
 func (c Collar) Parse() (string, string) {
