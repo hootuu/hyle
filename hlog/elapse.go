@@ -2,13 +2,44 @@ package hlog
 
 import (
 	"context"
+	"github.com/hootuu/hyle/hcfg"
 	"go.uber.org/zap"
 	"time"
+)
+
+type ElapseLevel int
+
+const (
+	_ ElapseLevel = iota
+	ElapsePackage
+	ElapseComponent
+	ElapseFunction
+	ElapseDetail
 )
 
 const (
 	TraceIdKey = "_trace_id_"
 )
+
+var gElapseLevel = ElapseDetail
+
+func init() {
+	iLevel := hcfg.GetInt("hlog.elapse.level", int(ElapseDetail))
+	gElapseLevel = ElapseLevel(iLevel)
+}
+
+func IsElapsePackage() bool {
+	return gElapseLevel == ElapsePackage
+}
+func IsElapseComponent() bool {
+	return gElapseLevel == ElapseComponent
+}
+func IsElapseFunction() bool {
+	return gElapseLevel == ElapseFunction
+}
+func IsElapseDetail() bool {
+	return gElapseLevel == ElapseDetail
+}
 
 func Elapse(fun string, fix ...func() []zap.Field) func() {
 	start := time.Now()
