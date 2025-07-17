@@ -2,6 +2,7 @@ package hlog
 
 import (
 	"context"
+	"github.com/hootuu/hyle/data/idx"
 	"github.com/hootuu/hyle/hcfg"
 	"go.uber.org/zap"
 	"time"
@@ -20,6 +21,16 @@ const (
 const (
 	TraceIdKey = "_trace_id_"
 )
+
+func NewTraceCtx(ctx context.Context) context.Context {
+	traceIdStr := ""
+	if traceIdObj := ctx.Value(TraceIdKey); traceIdObj != nil {
+		traceIdStr = traceIdObj.(string)
+	} else {
+		traceIdStr = idx.New()
+	}
+	return context.WithValue(ctx, TraceIdKey, traceIdStr)
+}
 
 var gElapseLevel = ElapseDetail
 
