@@ -76,8 +76,10 @@ func ElapseWithCtx(ctx context.Context, fun string, fix ...func() []zap.Field) f
 	if len(fix) > 0 {
 		prefixFields = fix[0]()
 	}
+	traceIdStr := ""
 	if traceIdObj := ctx.Value(TraceIdKey); traceIdObj != nil {
-		prefixFields = append(prefixFields, zap.String(TraceIdKey, traceIdObj.(string)))
+		traceIdStr = traceIdObj.(string)
+		prefixFields = append(prefixFields, zap.String(TraceIdKey, traceIdStr))
 	}
 	if len(prefixFields) > 0 {
 		gElapseLogger.Info(">"+fun, prefixFields...)
@@ -88,14 +90,14 @@ func ElapseWithCtx(ctx context.Context, fun string, fix ...func() []zap.Field) f
 	return func() {
 		elapse := time.Since(start)
 		suffixFields := []zap.Field{zap.Int64("_elapse_", elapse.Milliseconds())}
+		if traceIdStr != "" {
+			suffixFields = append(suffixFields, zap.String(TraceIdKey, traceIdStr))
+		}
 		if len(fix) > 1 {
 			fs := fix[1]()
 			if len(fs) > 1 {
 				suffixFields = append(suffixFields, fs...)
 			}
-		}
-		if traceIdObj := ctx.Value(TraceIdKey); traceIdObj != nil {
-			suffixFields = append(suffixFields, zap.String(TraceIdKey, traceIdObj.(string)))
 		}
 		if len(suffixFields) > 0 {
 			gElapseLogger.Info("<"+fun, suffixFields...)
