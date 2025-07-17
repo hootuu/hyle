@@ -29,16 +29,16 @@ func init() {
 }
 
 func IsElapsePackage() bool {
-	return gElapseLevel == ElapsePackage
+	return gElapseLevel >= ElapsePackage
 }
 func IsElapseComponent() bool {
-	return gElapseLevel == ElapseComponent
+	return gElapseLevel >= ElapseComponent
 }
 func IsElapseFunction() bool {
-	return gElapseLevel == ElapseFunction
+	return gElapseLevel >= ElapseFunction
 }
 func IsElapseDetail() bool {
-	return gElapseLevel == ElapseDetail
+	return gElapseLevel >= ElapseDetail
 }
 
 func Elapse(fun string, fix ...func() []zap.Field) func() {
