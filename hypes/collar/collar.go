@@ -91,3 +91,7 @@ func (c Collar) ToID() ID {
 func (c Collar) ToSafeID() ID {
 	return hmd5.MD5(hmd5.MD5(c.ToID()))
 }
+
+func (c Collar) Link() Link {
+	return Link(base58.Encode([]byte(c)))
+}

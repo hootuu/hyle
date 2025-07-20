@@ -18,7 +18,14 @@ func (tag *Tag) Exists(t string) bool {
 	return false
 }
 
-func (tag *Tag) Append(t string) *Tag {
+func (tag *Tag) Append(t ...string) *Tag {
+	for _, v := range t {
+		tag.doAppend(v)
+	}
+	return tag
+}
+
+func (tag *Tag) doAppend(t string) *Tag {
 	if tag.Exists(t) {
 		return tag
 	}
