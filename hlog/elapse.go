@@ -32,6 +32,17 @@ func NewTraceCtx(ctx context.Context) context.Context {
 	return context.WithValue(ctx, TraceIdKey, traceIdStr)
 }
 
+func TraceInfo(ctx context.Context) zap.Field {
+	if ctx == nil {
+		return zap.String(TraceIdKey, "-")
+	}
+	if traceIdObj := ctx.Value(TraceIdKey); traceIdObj != nil {
+		traceIdStr := traceIdObj.(string)
+		return zap.String(TraceIdKey, traceIdStr)
+	}
+	return zap.String(TraceIdKey, "-")
+}
+
 var gElapseLevel = ElapseDetail
 
 func init() {
