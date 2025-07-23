@@ -19,9 +19,9 @@ type SafeID string
 
 func Build(code string, id string) Collar {
 	str := code + split + id
-	if len(str) > 64 {
+	if len(str) > 128 {
 		hlog.Err("collar.length > 64 chars ", zap.String("code", code), zap.String("id", id))
-		str = str[:64]
+		str = str[:128]
 	}
 	return Collar(str)
 }
