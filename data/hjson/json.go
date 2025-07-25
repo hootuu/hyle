@@ -56,6 +56,10 @@ func MustFromBytes[T any](bData []byte) *T {
 			zap.String("json", string(bData)))
 		return nil
 	}
+	if ptrObj == nil {
+		var obj T
+		return &obj
+	}
 	return ptrObj
 }
 
