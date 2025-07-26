@@ -2,7 +2,9 @@ package collar
 
 import (
 	"fmt"
+	"github.com/hootuu/hyle/hlog"
 	"github.com/mr-tron/base58"
+	"go.uber.org/zap"
 	"strings"
 )
 
@@ -22,7 +24,7 @@ func (k Link) ToCodeID() (string, string, error) {
 	if err != nil {
 		return "", "", err
 	}
-	arr := strings.Split(string(src), split)
+	arr := strings.SplitN(string(src), split, 2)
 	if len(arr) != 2 {
 		return "", "", fmt.Errorf("invalid collar: %s", src)
 	}
@@ -50,7 +52,7 @@ func (k Link) ToCollar() (Collar, error) {
 	if err != nil {
 		return "", err
 	}
-	arr := strings.Split(string(src), split)
+	arr := strings.SplitN(string(src), split, 2)
 	if len(arr) != 2 {
 		return "", fmt.Errorf("invalid collar: %s", src)
 	}
@@ -58,6 +60,9 @@ func (k Link) ToCollar() (Collar, error) {
 }
 
 func (k Link) Display() string {
-	code, id, _ := k.ToCodeID()
+	code, id, err := k.ToCodeID()
+	if err != nil {
+		hlog.Fix("invalid link:", zap.String("link", k.Str()), zap.Error(err))
+	}
 	return fmt.Sprintf("%s:%s", code, id)
 }

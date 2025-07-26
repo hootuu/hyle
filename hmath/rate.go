@@ -66,3 +66,7 @@ func (r Rate) String(n int) string {
 	format := fmt.Sprintf("%%.%df", n)
 	return fmt.Sprintf(format, r.Value())
 }
+
+func (r Rate) Calc(v uint64) uint64 {
+	return v * r.Value() / uint64(r.Base())
+}

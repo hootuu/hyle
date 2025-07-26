@@ -34,6 +34,40 @@ func MustEx(ex *Ex) *Ex {
 	return ex
 }
 
+func MustFix(src *Ex, dst *Ex) *Ex {
+
+	if src != nil {
+		if dst == nil {
+			return src
+		}
+		newEx := EmptyEx()
+		if len(src.Tag) > 0 {
+			newEx.Tag.Append(src.Tag...)
+		}
+		if len(dst.Tag) > 0 {
+			newEx.Tag.Append(dst.Tag...)
+		}
+		if src.Meta != nil {
+			for k, v := range src.Meta {
+				newEx.Meta[k] = v
+			}
+		}
+		if dst.Meta != nil {
+			for k, v := range dst.Meta {
+				newEx.Meta[k] = v
+			}
+		}
+		return newEx
+		//todo add ctrl info
+
+	} else {
+		if dst == nil {
+			return EmptyEx()
+		}
+		return dst
+	}
+}
+
 func (e *Ex) SetCtrl(c ctrl.Ctrl) *Ex {
 	if c == nil {
 		c = ctrl.MustNewCtrl()

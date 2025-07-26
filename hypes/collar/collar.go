@@ -31,7 +31,7 @@ func FromID(id ID) (Collar, error) {
 	if err != nil {
 		return "", err
 	}
-	arr := strings.Split(string(src), split)
+	arr := strings.SplitN(string(src), split, 2)
 	if len(arr) != 2 {
 		return "", fmt.Errorf("invalid collar: %s", src)
 	}
@@ -72,7 +72,7 @@ func MultiMustParse(call func(code string, id string), ids ...ID) {
 }
 
 func (c Collar) Parse() (string, string) {
-	arr := strings.Split(string(c), split)
+	arr := strings.SplitN(string(c), split, 2)
 	if len(arr) != 2 {
 		hlog.Err("hypes.collar.Parse: invalid Collar", zap.String("collar", string(c)))
 		return "", ""
