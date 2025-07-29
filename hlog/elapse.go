@@ -117,7 +117,7 @@ func ElapseWithCtx(ctx context.Context, fun string, fix ...func() []zap.Field) f
 		}
 		if len(fix) > 1 {
 			fs := fix[1]()
-			if len(fs) > 1 {
+			if len(fs) > 0 {
 				suffixFields = append(suffixFields, fs...)
 			}
 		}

@@ -3,6 +3,7 @@ package ex
 import (
 	"github.com/hootuu/hyle/data/ctrl"
 	"github.com/hootuu/hyle/data/dict"
+	"github.com/hootuu/hyle/data/hjson"
 	"github.com/hootuu/hyle/data/tag"
 )
 
@@ -97,4 +98,19 @@ func EmptyEx() *Ex {
 		SetCtrl(ctrl.MustNewCtrl()).
 		SetTag(tag.NewTag()).
 		SetMeta(dict.NewDict())
+}
+
+func WithBytes(ctrl Ctrl, tag []byte, meta []byte) *Ex {
+	ex := &Ex{
+		Ctrl: ctrl,
+		Tag:  nil,
+		Meta: nil,
+	}
+	if len(tag) > 0 {
+		ex.Tag = *hjson.MustFromBytes[Tag](tag)
+	}
+	if len(meta) > 0 {
+		ex.Meta = *hjson.MustFromBytes[Meta](meta)
+	}
+	return ex
 }
