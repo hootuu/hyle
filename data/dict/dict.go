@@ -8,6 +8,9 @@ import (
 type Dict = objx.Map
 
 func New(data interface{}) Dict {
+	if data == nil {
+		return objx.New(make(map[string]interface{}))
+	}
 	return objx.New(data)
 }
 
