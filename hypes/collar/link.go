@@ -39,6 +39,22 @@ func (k Link) MustToCodeID() (string, string) {
 	return code, id
 }
 
+func (k Link) MustToCode() string {
+	code, _, err := k.ToCodeID()
+	if err != nil {
+		return ""
+	}
+	return code
+}
+
+func (k Link) MustToID() ID {
+	_, id, err := k.ToCodeID()
+	if err != nil {
+		return ""
+	}
+	return id
+}
+
 func (k Link) MustToDict() *LinkDict {
 	code, id := k.MustToCodeID()
 	return &LinkDict{
