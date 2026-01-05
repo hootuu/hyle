@@ -62,7 +62,7 @@ func newLogger(key string) *zap.Logger {
 	fileName := rootPath + hcfg.GetString("logger."+key+".file", key+".jsonl")
 	maxSize := hcfg.GetInt64("logger."+key+".size.max", 64*1024*1024)
 	maxBackups := hcfg.GetInt("logger."+key+".backup.max", 30)
-	maxAge := hcfg.GetDuration("logger."+key+".age.max", 7)
+	maxAge := hcfg.GetDuration("logger."+key+".age.max", 30)
 	compress := hcfg.GetBool("logger."+key+".compress", false)
 	hsys.Success("# Initialize the " + key + " log system ..... #")
 	hsys.Info(" * PATH: ", strings.ToUpper(rootPath), "      ${ logger."+key+".root }")
